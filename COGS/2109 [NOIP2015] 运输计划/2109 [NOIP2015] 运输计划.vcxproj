@@ -76,6 +76,11 @@
       <SDLCheck>true</SDLCheck>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
+    <Link>
+      <HeapReserveSize>
+      </HeapReserveSize>
+      <StackReserveSize>1234567890</StackReserveSize>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

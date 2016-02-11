@@ -19,9 +19,9 @@ int main()
 		int mid = l + (r - l) / 2;
 		int cnt = 0, la = 0;
 		for (int i = 1; i <= n; i++)
-			if (a[i] - la<mid) cnt++;
+			if (a[i] - la < mid) cnt++;
 			else la = a[i];
-			if (a[n + 1] - la<mid) cnt++;
+			if (a[n + 1] - la < mid) cnt++;
 			if (cnt <= m)
 			{
 				ans = mid;

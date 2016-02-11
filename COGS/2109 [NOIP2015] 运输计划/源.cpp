@@ -1,96 +1,172 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 #include <algorithm>
-#include <vector>
-#include <climits>
+#include <cstring>
+#include <cctype>
+#include <cstdarg>
 using namespace std;
-struct Edge
+const int N = 3e5;
+struct edge
 {
-	int To, Pow;
-};
-vector<Edge> G[300001];
-int f[300001][20], d[300001][20], dep[300001], u[300001], v[300001];
+	int to, pow, next;
+	edge(int to, int pow, int next) :to(to), pow(pow), next(next) {}
+	edge() = default;
+} e[(N - 1) * 2];
+int g[N];
+struct { int fa, pow, dis, dep; } p[N];
+struct { int u, v, lca, dis; } d[N];
+void add_edge(int from, int to, int pow)
+{
+	static int cnt = 0;
+	e[cnt] = edge(to, pow, g[from]);
+	g[from] = cnt++;
+}
 void dfs(int u, int fa)
 {
-	for (int i = 0; i<G[u].size(); i++)
+	for (int i = g[u]; i != -1; i = e[i].next)
 	{
-		int v = G[u][i].To;
-		if (v != fa)
+		edge &v = e[i];
+		if (v.to != fa)
 		{
-			d[v][0] = G[u][i].Pow;
-			dfs(v, u);
+			p[v.to].fa = u;
+			p[v.to].pow = v.pow;
+			p[v.to].dis = p[u].dis + v.pow;
+			p[v.to].dep = p[u].dep + 1;
+			dfs(v.to, u);
 		}
 	}
 }
-void lca_dfs(int u, int fa)
+namespace lca
 {
-	dep[u] = dep[fa] + d[u][0];
-	for (int i = 1; i<20; i++)
+	const int K = 20;
+	int f[N][K];
+	void dfs(int u)
 	{
-		f[u][i] = f[f[u][i - 1]][i - 1];
-		d[u][i] = d[u][i - 1] + d[f[u][i - 1]][i - 1];
-	}
-	for (int i = 0; i<G[u].size(); i++)
-	{
-		int v = G[u][i].To;
-		if (v != fa)
+		f[u][0] = p[u].fa;
+		for (int i = 1; i < K; i++) f[u][i] = f[f[u][i - 1]][i - 1];
+		for (int i = g[u]; i != -1; i = e[i].next)
 		{
-			f[v][0] = u;
-			lca_dfs(v, u);
+			edge &v = e[i];
+			if (v.to != p[u].fa) dfs(v.to);
 		}
+	}
+	int get_lca(int u, int v)
+	{
+		if (p[u].dep < p[v].dep) swap(u, v);
+		for (int i = K - 1; i >= 0; i--)
+			if (p[f[u][i]].dep >= p[v].dep)
+				u = f[u][i];
+		if (u == v) return u;
+		for (int i = K - 1; i >= 0;i--)
+			if (f[u][i] != f[v][i])
+			{
+				u = f[u][i];
+				v = f[v][i];
+			}
+		return p[u].fa;
 	}
 }
-int lca(int u, int v)
+namespace bin
 {
-	if (dep[u]<dep[v]) swap(u, v);
-	int diff = dep[u] - dep[v];
-	for (int i = 19; i >= 0; i--)
-		if (f[u][i] != 0 && d[u][i] <= diff)
+	int flag[N], max, cnt, dcnt;
+	void dfs(int u)
+	{
+		for (int i = g[u]; i != -1; i = e[i].next)
 		{
-			diff -= d[u][i];
-			u = f[u][i];
+			edge &v = e[i];
+			if (v.to != p[u].fa)
+			{
+				int tmp = cnt;
+				cnt = 0;
+				dfs(v.to);
+				cnt += tmp;
+			}
 		}
-	if (u == v) return u;
-	for (int i = 19; i >= 0; i--)
-		if (f[u][i] != 0 && f[v][i] != 0 && f[u][i] != f[v][i])
+		cnt += flag[u];
+		if (cnt == dcnt) max = std::max(max, p[u].pow);
+	}
+}
+char get_ch(FILE *in)
+{
+	const int S = 10000000;
+	static char buf[S];
+	static int pos = S;
+	if (pos == S)
+	{
+		fread(buf, 1, S, in);
+		pos = 0;
+	}
+	return buf[pos++];
+}
+void read(FILE *in, int n, ...)
+{
+	va_list li;
+	va_start(li, n);
+	while (n--)
+	{
+		int &x = *va_arg(li, int *);
+		x = 0;
+		char ch;
+		do ch = get_ch(in);
+		while (!isdigit(ch));
+		do
 		{
-			u = f[u][i];
-			v = f[v][i];
-		}
-	return f[u][0];
+			(x *= 10) += ch - '0';
+			ch = get_ch(in);
+		} while (isdigit(ch));
+	}
+	va_end(li);
 }
 int main()
 {
-#ifndef DEBUG
-	freopen("transport.in", "r", stdin);
-	freopen("transport.out", "w", stdout);
-#endif
+	FILE *in = fopen("transport.in", "r"), *out = fopen("transport.out", "w");
 	int n, m;
-	scanf("%d%d", &n, &m);
-	for (int i = 1; i<n; i++)
+	read(in, 2, &n, &m);
+	memset(g, 0xff, sizeof g);
+	for (int i = 0; i < n - 1; i++)
 	{
 		int a, b, t;
-		scanf("%d%d%d", &a, &b, &t);
-		G[a].push_back((Edge) { b, t });
-		G[b].push_back((Edge) { a, t });
+		read(in, 3, &a, &b, &t);
+		a--, b--;
+		add_edge(a, b, t);
+		add_edge(b, a, t);
 	}
-	for (int i = 1; i <= m; i++)
-		scanf("%d%d", &u[i], &v[i]);
-	dfs(1, 0);
-	int ans = INT_MAX;
-	for (int i = 2; i <= n; i++)
+	dfs(0, 0);
+	lca::dfs(0);
+	for (int i = 0; i < m; i++)
 	{
-		int t = d[i][0];
-		d[i][0] = 0;
-		lca_dfs(1, 0);
-		int tmp = 0;
-		for (int j = 1; j <= m; j++)
-		{
-			int l = lca(u[j], v[j]);
-			tmp = max(tmp, dep[u[j]] + dep[v[j]] - 2 * dep[l]);
-		}
-		d[i][0] = t;
-		ans = min(ans, tmp);
+		read(in, 2, &d[i].u, &d[i].v);
+		d[i].u--, d[i].v--;
+		d[i].lca = lca::get_lca(d[i].u, d[i].v);
+		d[i].dis = p[d[i].u].dis + p[d[i].v].dis - p[d[i].lca].dis * 2;
 	}
-	if (ans == 4954) printf("4654");
-	else printf("%d", ans);
+	int l = 0, r = N * 1000, ans;
+	using namespace bin;
+	while (l <= r)
+	{
+		int mid = (l + r) / 2, max = 0, cnt = 0;
+		memset(flag, 0x00, sizeof flag);
+		for (int i = 0; i < m; i++)
+			if (d[i].dis > mid)
+			{
+				flag[d[i].u]++;
+				flag[d[i].v]++;
+				flag[d[i].lca] -= 2;
+				max = std::max(max, d[i].dis);
+				cnt++;
+			}
+		if (cnt > 0)
+		{
+			bin::max = 0;
+			bin::dcnt = cnt;
+			bin::dfs(0);
+		}
+		if (cnt == 0 || max - bin::max <= mid)
+		{
+			ans = mid;
+			r = mid - 1;
+		}
+		else l = mid + 1;
+	}
+	fprintf(out, "%d\n", ans);
 }
