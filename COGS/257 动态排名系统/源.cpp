@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <cstdio>
 #include <algorithm>
 #include <cassert>
@@ -6,7 +7,7 @@
 #include <cstdarg>
 #include <cctype>
 using namespace std;
-const int N = 4000000;
+const int N = 1500000;
 struct seg_node
 {
 	seg_node *l, *r;
@@ -42,7 +43,7 @@ seg_node *seg_update(seg_node *x, int l, int r, int k, int val)
 	if (l != r - 1)
 		if (k < (l + r) / 2) x->l = seg_update(x->l, l, (l + r) / 2, k, val);
 		else x->r = seg_update(x->r, (l + r) / 2, r, k, val);
-		return x;
+	return x;
 }
 int lowbit(int x) { return x&-x; }
 void update(int x, int k, int val, seg_node **t, int n, int m)
@@ -61,11 +62,13 @@ void init_iterator(node_list_iterator &it, int x, seg_node **t)
 		x -= lowbit(x);
 	}
 }
-int query(int sl, int sr, int k, seg_node **t, int m)
+int query(int sl, int sr, int k, seg_node **t, seg_node **ct, int m)
 {
 	node_list_iterator il, ir;
 	init_iterator(il, sl - 1, t);
+	il.v.push_back(ct[sl - 1]);
 	init_iterator(ir, sr, t);
+	ir.v.push_back(ct[sr]);
 	int l = 0, r = m;
 	while (l != r - 1)
 	{
@@ -85,6 +88,16 @@ int query(int sl, int sr, int k, seg_node **t, int m)
 		}
 	}
 	return l;
+}
+seg_node *chair_update(seg_node *n, int l, int r, int k)
+{
+	seg_node *x = new_node();
+	memcpy(x, n, sizeof(seg_node));
+	x->val++;
+	if (l != r - 1)
+		if (k < (l + r) / 2) x->l = chair_update(x->l, l, (l + r) / 2, k);
+		else x->r = chair_update(x->r, (l + r) / 2, r, k);
+	return x;
 }
 void read(FILE *f, int n, ...)
 {
@@ -120,9 +133,10 @@ int main()
 		cnt = 0;
 		int n, m;
 		read(in, 2, &n, &m);
-		seg_node **t = new seg_node *[n + 1], *nul = new_node();
+		seg_node **t = new seg_node *[n + 1], *nul = new_node(), **ct = new seg_node*[n + 1];
 		nul->l = nul->r = nul;
 		nul->val = 0;
+		ct[0] = nul;
 		for (int i = 1; i <= n; i++) t[i] = nul;
 		char *op = new char[m];
 		int *a = new int[n], *x = new int[m], *y = new int[m], *z = new int[m];
@@ -144,12 +158,12 @@ int main()
 		for (int i = 0; i < n; i++)
 		{
 			a[i] = lower_bound(b.begin(), b.end(), a[i]) - b.begin();
-			update(i + 1, a[i], 1, t, n, b.size());
+			ct[i + 1] = chair_update(ct[i], 0, b.size(), a[i]);
 		}
 		for (int i = 0; i < m; i++)
 		{
 			if (op[i] == 'Q')
-				fprintf(out, "%d\n", b[query(x[i], y[i], z[i], t, b.size())]);
+				fprintf(out, "%d\n", b[query(x[i], y[i], z[i], t, ct, b.size())]);
 			else if (op[i] == 'C')
 			{
 				y[i] = lower_bound(b.begin(), b.end(), y[i]) - b.begin();
@@ -158,6 +172,6 @@ int main()
 				a[x[i] - 1] = y[i];
 			}
 		}
-		delete[] t, op, a, x, y, z;
+		delete[] t, op, a, x, y, z, ct;
 	}
 }
