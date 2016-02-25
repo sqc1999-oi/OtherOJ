@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdarg>
 #include <cctype>
+#include <cstdarg>
 using namespace std;
 const int N = 2e6;
 struct seg_node
@@ -53,6 +54,13 @@ void read(FILE *f, int n, ...)
 	}
 	va_end(li);
 }
+void _delete(int n, ...)
+{
+	va_list li;
+	va_start(li, n);
+	while (n--) delete[] va_arg(li, void *);
+	va_end(li);
+}
 int main()
 {
 	FILE *in = fopen("kth.in", "r"), *out = fopen("kth.out", "w");
@@ -74,5 +82,5 @@ int main()
 		read(in, 3, &l, &r, &k);
 		fprintf(out, "%d\n", b[query(rt[l - 1], rt[r], 0, n, k)]);
 	}
-	delete[] rt, a, b;
+	_delete(3, rt, a, b);
 }

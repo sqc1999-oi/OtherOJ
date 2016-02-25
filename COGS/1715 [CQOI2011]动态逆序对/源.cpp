@@ -3,6 +3,8 @@
 #include <cstring>
 #include <vector>
 #include <cassert>
+#include <fstream>
+#include <cstdarg>
 using namespace std;
 const int N = 5000000;
 struct seg_node
@@ -13,22 +15,16 @@ struct seg_node
 struct node_list_iterator
 {
 	vector<seg_node *> v;
-	bool rev;
-	long long get_left_val()
+	long long get_val(bool flag)
 	{
 		long long ret = 0;
-		for (int i = 0; i < v.size(); i++) ret += (rev ? v[i]->r : v[i]->l)->val;
+		for (int i = 0; i < v.size(); i++) ret += (flag ? v[i]->r : v[i]->l)->val;
 		return ret;
 	}
-	void move_left()
+	void move(bool flag)
 	{
 		for (int i = 0; i < v.size(); i++)
-			v[i] = (rev ? v[i]->r : v[i]->l);
-	}
-	void move_right()
-	{
-		for (int i = 0; i < v.size(); i++)
-			v[i] = (rev ? v[i]->l : v[i]->r);
+			v[i] = flag ? v[i]->r : v[i]->l;
 	}
 };
 seg_node *new_node()
@@ -65,15 +61,16 @@ seg_node *update(seg_node *x, int l, int r, int k, long long val)
 		x = tmp;
 	}
 	x->val += val;
-	if (k < (l + r) / 2) x->l = update(x->l, l, (l + r) / 2, k, val);
-	else x->r = update(x->r, (l + r) / 2, r, k, val);
+	if (l != r - 1)
+		if (k < (l + r) / 2) x->l = update(x->l, l, (l + r) / 2, k, val);
+		else x->r = update(x->r, (l + r) / 2, r, k, val);
 	return x;
 }
-void update(int k, int x, seg_node **t, int n)
+void update(int k, int p, int x, seg_node **t, int n)
 {
 	while (k <= n)
 	{
-		t[k] = update(t[k], 0, n, k, x);
+		t[k] = update(t[k], 0, n, p, x);
 		k += lowbit(k);
 	}
 }
@@ -90,54 +87,70 @@ long long query(int tl, int tr, int k, seg_node **t, int n, bool flag)
 	node_list_iterator il, ir;
 	init_iterator(il, tl - 1, t);
 	init_iterator(ir, tr, t);
-	il.rev = ir.rev = flag;
 	int l = 0, r = n;
 	long long ret = 0;
 	while (l != r - 1)
 	{
-		if ((k < (l + r) / 2) ^ flag ^ 1)
+		if (k < (l + r) / 2 ^ flag)
 		{
-			il.move_left();
-			ir.move_left();
+			il.move(flag);
+			ir.move(flag);
 			(flag ? l : r) = (l + r) / 2;
 		}
 		else
 		{
-			ret += ir.get_left_val() - il.get_left_val();
-			il.move_right();
-			ir.move_right();
+			ret += ir.get_val(flag) - il.get_val(flag);
+			il.move(flag ^ 1);
+			ir.move(flag ^ 1);
 			(flag ? r : l) = (l + r) / 2;
 		}
 	}
 	return ret;
 }
+void _delete(int n, ...)
+{
+	va_list li;
+	va_start(li, n);
+	while (n--) delete[] va_arg(li, void *);
+	va_end(li);
+}
 int main()
 {
+	ifstream cin("inverse.in");
+	ofstream cout("inverse.out");
 	ios::sync_with_stdio(false);
 	int n, m;
 	cin >> n >> m;
 	int *a = new int[n], *t = new int[n + 1], *p = new int[n];
-	long long ans = 0, *f = new long long[n], *b = new long long[n];
+	long long ans = 0, *cnt = new long long[n];
+	memset(t + 1, 0x00, sizeof(int)*n);
 	for (int i = 0; i < n; i++)
 	{
 		cin >> a[i];
-		ans += b[i] = query(n, t) - query(a[i], t);
+		ans += cnt[i] = query(n, t) - query(a[i], t);
 		update(a[i], 1, t, n);
 		a[i]--;
 		p[a[i]] = i;
 	}
-	memset(t, 0x00, sizeof t);
+	memset(t + 1, 0x00, sizeof(int)*n);
 	for (int i = n - 1; i >= 0; i--)
 	{
-		f[i] = query(a[i], t);
+		cnt[i] += query(a[i], t);
 		update(a[i] + 1, 1, t, n);
 	}
 	delete[] t;
-	seg_node **st = new seg_node *[n + 1];
+	seg_node **st = new seg_node *[n + 1], *nul = new_node();
+	nul->l = nul->r = nul;
+	nul->val = 0;
+	for (int i = 0; i <= n; i++) st[i] = nul;
 	for (int i = 0; i < m; i++)
 	{
+		cout << ans << endl;
 		int x;
 		cin >> x;
-
+		x = p[x - 1];
+		ans -= cnt[x] - query(1, x, a[x], st, n, true) - query(x + 2, n, a[x], st, n, false);
+		update(x + 1, a[x], 1, st, n);
 	}
+	_delete(4, a, p, cnt, st);
 }

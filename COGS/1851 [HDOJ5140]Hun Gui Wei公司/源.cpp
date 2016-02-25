@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include <cassert>
+#include <cstdarg>
 using namespace std;
 const int N = 4e6;
 struct seg_node
@@ -37,6 +38,13 @@ long long query(seg_node *x, int l, int r, int ql, int qr)
 	if (qr < (l + r) / 2) return query(x->l, l, (l + r) / 2, ql, qr);
 	if (ql > (l + r) / 2) return query(x->r, (l + r) / 2, r, ql, qr);
 	return query(x->l, l, (l + r) / 2, ql, (l + r) / 2) + query(x->r, (l + r) / 2, r, (l + r) / 2, qr);
+}
+void _delete(int n, ...)
+{
+	va_list li;
+	va_start(li, n);
+	while (n--) delete[] va_arg(li, void *);
+	va_end(li);
 }
 int main()
 {
@@ -83,6 +91,6 @@ int main()
 			last = query(rt[hl], 0, e - c, la, ha) - query(rt[ll], 0, e - c, la, ha);
 			cout << last << endl;
 		}
-		delete[] a, b, c, rt;
+		_delete(4, a, b, c, rt);
 	}
 }

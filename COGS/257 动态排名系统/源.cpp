@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdarg>
 #include <cctype>
+#include <cstdarg>
 using namespace std;
 const int N = 1500000;
 struct seg_node
@@ -123,6 +124,13 @@ int nextch(FILE *f)
 	while (ret == ' ' || ret == '\r' || ret == '\n');
 	return ret;
 }
+void _delete(int n, ...)
+{
+	va_list li;
+	va_start(li, n);
+	while (n--) delete[] va_arg(li, void *);
+	va_end(li);
+}
 int main()
 {
 	FILE *in = fopen("dynrank.in", "r"), *out = fopen("dynrank.out", "w");
@@ -172,6 +180,6 @@ int main()
 				a[x[i] - 1] = y[i];
 			}
 		}
-		delete[] t, op, a, x, y, z, ct;
+		_delete(7, t, op, a, x, y, z, ct);
 	}
 }
