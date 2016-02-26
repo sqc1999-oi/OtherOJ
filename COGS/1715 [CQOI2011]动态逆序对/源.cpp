@@ -107,7 +107,7 @@ long long query(int tl, int tr, int k, seg_node **t, int n, bool flag)
 	}
 	return ret;
 }
-void _delete(int n, ...)
+void delete_n(int n, ...)
 {
 	va_list li;
 	va_start(li, n);
@@ -152,5 +152,5 @@ int main()
 		ans -= cnt[x] - query(1, x, a[x], st, n, true) - query(x + 2, n, a[x], st, n, false);
 		update(x + 1, a[x], 1, st, n);
 	}
-	_delete(4, a, p, cnt, st);
+	delete_n(4, a, p, cnt, st);
 }

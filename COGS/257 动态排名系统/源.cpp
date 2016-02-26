@@ -124,7 +124,7 @@ int nextch(FILE *f)
 	while (ret == ' ' || ret == '\r' || ret == '\n');
 	return ret;
 }
-void _delete(int n, ...)
+void delete_n(int n, ...)
 {
 	va_list li;
 	va_start(li, n);
@@ -180,6 +180,6 @@ int main()
 				a[x[i] - 1] = y[i];
 			}
 		}
-		_delete(7, t, op, a, x, y, z, ct);
+		delete_n(7, t, op, a, x, y, z, ct);
 	}
 }

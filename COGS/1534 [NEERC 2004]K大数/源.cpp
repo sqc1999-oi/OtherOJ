@@ -33,7 +33,7 @@ int query(seg_node *x, seg_node *y, int l, int r, int k)
 	if (k <= y->lc->val - x->lc->val) return query(x->lc, y->lc, l, (l + r) / 2, k);
 	return query(x->rc, y->rc, (l + r) / 2, r, k - (y->lc->val - x->lc->val));
 }
-void _delete(int n, ...)
+void delete_n(int n, ...)
 {
 	va_list li;
 	va_start(li, n);
@@ -64,5 +64,5 @@ int main()
 		cin >> l >> r >> k;
 		cout << b[query(rt[l - 1], rt[r], 0, e - b, k)] << endl;
 	}
-	_delete(3, rt, a, b);
+	delete_n(3, rt, a, b);
 }

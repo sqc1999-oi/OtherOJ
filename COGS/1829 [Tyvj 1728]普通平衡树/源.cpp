@@ -256,7 +256,7 @@ template<typename T> class rb_tree
 			y->left = x->left;
 			y->left->father = y;
 			y->color = x->color;
-			delete(x);
+			delete x;
 			maintain_size(y);
 		}
 		maintain_size(a);

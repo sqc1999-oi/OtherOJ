@@ -54,7 +54,7 @@ void read(FILE *f, int n, ...)
 	}
 	va_end(li);
 }
-void _delete(int n, ...)
+void delete_n(int n, ...)
 {
 	va_list li;
 	va_start(li, n);
@@ -82,5 +82,5 @@ int main()
 		read(in, 3, &l, &r, &k);
 		fprintf(out, "%d\n", b[query(rt[l - 1], rt[r], 0, n, k)]);
 	}
-	_delete(3, rt, a, b);
+	delete_n(3, rt, a, b);
 }
