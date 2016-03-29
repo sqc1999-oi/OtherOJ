@@ -2,36 +2,36 @@
 #include <algorithm>
 #include <cstring>
 using namespace std;
-const int N = 10, P = 2004;
+const int N = 10, P = 2004, M = 4;
+const int A[] = { 2,3,5,7 };
 int m[N];
-void calc_choose(int n, int k, int p, int *f)
-{
-	if (n == 1) return;
-	if (n & 1)
-	{
-		calc_choose(n - 1, k, p, f);
-		for (int i = k; i > 0; i--)
-			f[i] = (f[i] + f[i - 1]) % p;
-	}
-	else
-	{
-		calc_choose(n >> 1, k, p, f);
-		for (int i = k; i > 0; i--)
-		{
-			int t = 0;
-			for (int j = 0; j <= i; j++)
-				t += f[j] * f[i - j];
-			f[i] = t%p;
-		}
-	}
-};
 int mod_choose(int n, int k, int p)
 {
-	static int f[N + 1];
-	memset(f, 0x00, sizeof f);
-	f[0] = f[1] = 1;
-	calc_choose(n, k, p, f);
-	return f[k];
+	static int a[M];
+	memset(a, 0x00, sizeof a);
+	for (int i = 2; i <= k; i++)
+	{
+		int t = i;
+		for (int j = 0; j < M; j++)
+			while (t%A[j] == 0)
+			{
+				t /= A[j];
+				a[j]++;
+			}
+	}
+	int ret = 1;
+	for (int i = n - k + 1; i <= n; i++)
+	{
+		int t = i;
+		for (int j = 0; j < M; j++)
+			while (a[j]>0 && t%A[j] == 0)
+			{
+				t /= A[j];
+				a[j]--;
+			}
+		ret = (long long)ret*t%p;
+	}
+	return ret;
 }
 int calc(int n, int *m, int x, int p)
 {
