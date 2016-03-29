@@ -69,14 +69,12 @@ int crt(int n, const vector<int> &v, const vector<int> &p)
 }
 int derange(int n, int p)
 {
-	static int h[P * 2 + 1];
+	static int h[P * 2];
 	h[0] = 1;
 	h[1] = 0;
-	for (int i = 2;; i++)
-	{
-		h[i] = (long long)(i - 1)*(h[i - 1] + h[i - 2]) % p;
-		if (h[i - 1] == 1 && h[i] == 0 && i%p == 1) return h[n % (i - 1)];
-	}
+	for (int i = 2; i < p * 2; i++)
+		h[i] = ((long long)i*h[i - 1] + (i & 1 ? p - 1 : 1)) % p;
+	return h[n % (p * 2)];
 }
 int choose(int n, int m, int p)
 {
