@@ -86,7 +86,7 @@ void dft(cmplx *a, int n, int flag)
 			}
 		}
 	}
-	if (flag == -1)    for (int i = 0; i < n; i++) tmp[i] /= n;
+	if (flag == -1) for (int i = 0; i < n; i++) tmp[i] /= n;
 	for (int i = 0; i < n; i++) a[i] = tmp[i];
 }
 long long calc_ans(int u)
