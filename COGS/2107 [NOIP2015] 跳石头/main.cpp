@@ -1,4 +1,4 @@
-#include <cstdio>
+﻿#include <cstdio>
 #include <algorithm>
 using namespace std;
 int a[50002];

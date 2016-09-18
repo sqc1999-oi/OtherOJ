@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <algorithm>
 using namespace std;
 const int N = 1000, P = 1e9 + 7, INV_2 = 500000004;

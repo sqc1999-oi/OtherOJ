@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <algorithm>
 using namespace std;
 const int N = 1e5, K = 23, P = (1 << 23) - 1;
