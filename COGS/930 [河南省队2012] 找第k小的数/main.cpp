@@ -1,4 +1,5 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 #include <cstring>
 #include <cassert>

@@ -1,13 +1,12 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 using namespace std;
 int a[50002];
 int main()
 {
-#ifndef DEBUG
 	freopen("2015stone.in", "r", stdin);
 	freopen("2015stone.out", "w", stdout);
-#endif
 	int L, n, m;
 	scanf("%d%d%d", &L, &n, &m);
 	for (int i = 1; i <= n; i++)

@@ -1,4 +1,5 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 #include <cstring>
 using namespace std;
@@ -7,10 +8,8 @@ char a[1002], b[202];
 int f[2][201][201][2];
 int main()
 {
-#ifndef DEBUG
 	freopen("2015substring.in", "r", stdin);
 	freopen("2015substring.out", "w", stdout);
-#endif
 	int n, m, K;
 	scanf("%d%d%d%s%s", &n, &m, &K, a + 1, b + 1);
 	f[0][0][0][0] = 1;

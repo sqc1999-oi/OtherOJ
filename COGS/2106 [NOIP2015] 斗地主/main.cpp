@@ -1,4 +1,5 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 #include <cstring>
 #include <map>
@@ -159,10 +160,8 @@ int dfs()
 }
 int main()
 {
-#ifndef DEBUG
 	freopen("landlords.in", "r", stdin);
 	freopen("landlords.out", "w", stdout);
-#endif
 	int T, n;
 	scanf("%d%d", &T, &n);
 	while (T--)

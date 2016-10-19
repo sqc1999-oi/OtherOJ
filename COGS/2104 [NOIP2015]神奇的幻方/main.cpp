@@ -1,13 +1,12 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 using namespace std;
 int a[40][40];
 int main()
 {
-#ifndef DEBUG
 	freopen("2015magic.in", "r", stdin);
 	freopen("2015magic.out", "w", stdout);
-#endif
 	int n;
 	scanf("%d", &n);
 	int x = 1, y = n / 2 + 1;

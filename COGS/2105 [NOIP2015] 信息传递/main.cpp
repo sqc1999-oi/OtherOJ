@@ -1,4 +1,5 @@
-﻿#include <cstdio>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
 #include <algorithm>
 #include <vector>
 #include <queue>
@@ -34,10 +35,8 @@ int bfs(int s)
 }
 int main()
 {
-#ifndef DEBUG
 	freopen("2015message.in", "r", stdin);
 	freopen("2015message.out", "w", stdout);
-#endif
 	int n;
 	scanf("%d", &n);
 	for (int i = 0; i < n; i++)
